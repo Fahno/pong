@@ -1,2 +1,2 @@
 # pong
-pong game
+Canvas based Pong! game
