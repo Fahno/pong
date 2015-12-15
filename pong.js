@@ -3,6 +3,7 @@ var ctx = canvas.getContext("2d");
 var targetFPS = 60;
 var delta = 0, then = 0, now  = 0;
 var gameObjects = [];
+var left = false, right = false, a = false, d = false;
 
 var gameObject = function(x, y, width, height, id) {
   gameObjects[gameObjects.length] = {
@@ -15,7 +16,7 @@ var gameObject = function(x, y, width, height, id) {
 }
 
 var update = function() {
-  
+  console.log("a: " + a + ", right: " + right);
 };
 
 var render = function() {
@@ -51,8 +52,16 @@ var mainGameLoop = function () {
 };
 
 var init = function() {
-  gameObject(window.innerWidth / 2 - 10, window.innerHeight / 2 - 10, 10, 10, "ball");
-  gameObject(window.innerWidth / 2 - 50, 0, 50, 5, "topPaddle");
+  gameObject(window.innerWidth / 2 - 10 / 2, window.innerHeight / 2 - 10 / 2, 10, 10, "ball");
+  gameObject(window.innerWidth / 2 - 70 / 2, 0, 70, 10, "topPaddle");
+  gameObject(window.innerWidth / 2 - 70 / 2, window.innerHeight - 10, 70, 10, "bottomPaddle");
+
+  document.addEventListener('keydown', function(event) {
+    if(event.keyCode === 37) { left = true } else { left = false }
+    if(event.keyCode === 39) { right = true } else { right = false }
+    if(event.keyCode === 97) { a = true } else { a = false }
+    if(event.keyCode === 100) { d = true } else { d = false }
+  });
 };
 
 init();
