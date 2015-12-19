@@ -1,7 +1,7 @@
 var canvas = document.getElementById("canvas");
 var ctx = canvas.getContext("2d");
 var then = new Date().getTime(), now, delta = 0;
-var targetUPS = 120;
+var targetUPS = 10;
 var left, right, a, d; 
 var paddleSpeed = 7;
 var topScore = 0, bottomScore = 0;
@@ -24,6 +24,11 @@ var ball = {
 	update: function() {
 		this.x += this.velX;
 		this.y += this.velY;
+		
+		if(checkCollision(this, paddleTop) || checkCollision(this, paddleBottom) && (this.x > paddleTop.x + paddleTop.width || this.x > paddleBottom.x + paddleBottom.width || this.x + this.width < paddleTop.x || this.x + this.width < paddleBottom.x)) {
+			this.velX *= -1;
+			return;
+		}
 		
 		if(checkCollision(this, paddleTop) || checkCollision(this, paddleBottom)) {
 			this.velY *= -1;
