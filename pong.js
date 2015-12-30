@@ -24,12 +24,19 @@ var ball = {
 	},
 
 	update: function() {
+		console.log("VelY: " + this.velY + ", VelX: " + this.velX + ", X: " + this.x + ", Y: " + this.y + ", BallSpeedY: " + ballSpeedY);
 
 		this.x += this.velX;
 		this.y += this.velY;
 
-		if(checkCollision(this, paddleLeft) || checkCollision(this, paddleRight)) {
+		if(checkCollision(this, paddleLeft)) {
 			this.velX *= -1;
+			this.velY = ballSpeedY * 1.5 * ((this.y - paddleLeft.y) / paddleRight.height);
+		}
+
+		if(checkCollision(this, paddleRight)) {
+			this.velX *= -1;
+			this.velY = ballSpeedY * 1.5 * ((this.y - paddleRight.y) / paddleRight.height);
 		}
 
 		if(this.y <= 0 || this.y + this.height >= canvas.height) {
@@ -60,6 +67,7 @@ var paddleLeft = {
 	update: function() {
 		this.y += s === true ? paddleSpeed : 0;
 		this.y -= w === true ? paddleSpeed : 0;
+		this.y = clamp(this.y, 0, canvas.height - this.height);
 	}
 };
 
@@ -76,8 +84,15 @@ var paddleRight = {
 	update: function() {
 		this.y -= p === true ? paddleSpeed : 0;
 		this.y += l === true ? paddleSpeed : 0;
+		this.y = clamp(this.y, 0, canvas.height - this.height);
 	}
 };
+
+function clamp(v, min, max) {
+	v = v < min ? min : v;
+	v = v > max ? max : v;
+	return v;
+}
 
 function chooseNumber(v1, v2) {
 	rand = Math.random();
