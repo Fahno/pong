@@ -3,19 +3,21 @@ var ctx = canvas.getContext("2d");
 var then = new Date().getTime(), now, delta = 0;
 var targetUPS = 120;
 var left, right, a, d;
-var paddleSpeed = 7;
+var paddleSpeed = 7, ballSpeedX = 4, ballSpeedY = 4;
 var topScore = 0, bottomScore = 0;
+var resizeFactorX = 1, resizeFactorY = 1;
+//1280 * 650 normal 16:9 resolution
 
-canvas.width = window.innerWidth;
-canvas.height = window.innerHeight;
+canvas.width = 1280;
+canvas.height = 650;
 
 var ball = {
 	x: canvas.width / 2 - 10 / 2,
 	y: canvas.height / 2 - 10 / 2,
 	width: 10,
 	height: 10,
-	velY: chooseNumber(4, -4),
-	velX: 0,
+	velY: chooseNumber(ballSpeedY, -ballSpeedY),
+	velX: chooseNumber(ballSpeedX, -ballSpeedX),
 	render: function() {
 		ctx.fillStyle = "white";
 		ctx.fillRect(this.x, this.y, this.width, this.height);
@@ -26,8 +28,8 @@ var ball = {
 		this.x += this.velX;
 		this.y += this.velY;
 
-		if(checkCollision(this, paddleTop)) {
-
+		if(checkCollision(this, paddleTop) || checkCollision(this, paddleBottom)) {
+			this.velY *= -1;
 		}
 
 		if(this.x + this.width >= canvas.width || this.x <= 0) {
@@ -39,7 +41,8 @@ var ball = {
 			bottomScore += this.y < canvas.height / 2 ? 1 : 0;
 			this.x = canvas.width / 2 - 10 / 2;
 			this.y = canvas.height / 2 - 10 / 2;
-			this.velY = chooseNumber(4, -4);
+			this.velY = chooseNumber(ballSpeedY, -ballSpeedY);
+			this.velX = chooseNumber(ballSpeedX, -ballSpeedX);
 		}
 	}
 };
@@ -123,12 +126,39 @@ function update() {
 	ball.update();
 	paddleTop.update();
 	paddleBottom.update();
+	console.log(window.innerWidth, window.innerHeight);
 }
 
-window.addEventListener('resize', function() {
+function resize() {
+	resizeFactorX = window.innerWidth / canvas.width;
+	resizeFactorY = window.innerHeight / canvas.height;
+
 	canvas.width = window.innerWidth;
 	canvas.height = window.innerHeight;
-});
+
+	paddleTop.width *= resizeFactorX;
+	paddleTop.height *= resizeFactorY;
+	paddleTop.x *= resizeFactorX;
+	paddleTop.y *= resizeFactorY;
+
+	paddleBottom.width *= resizeFactorX;
+	paddleBottom.height *= resizeFactorY;
+	paddleBottom.x *= resizeFactorX;
+	paddleBottom.y *= resizeFactorY;
+
+	ball.width *= resizeFactorX;
+	ball.height *= resizeFactorY;
+	ball.x *= resizeFactorX;
+	ball.y *= resizeFactorY;
+	ball.velX *= resizeFactorX;
+	ball.velY *= resizeFactorY;
+
+	ballSpeedX *= resizeFactorX;
+	ballSpeedY *= resizeFactorY;
+	paddleSpeed *= resizeFactorX;
+}
+
+window.addEventListener('resize', resize);
 
 document.addEventListener('keydown', function(event) {
 	switch(event.keyCode) {
@@ -167,5 +197,7 @@ document.addEventListener('keyup', function(event) {
 			break;
 	}
 });
+
+resize();
 
 mainGameLoop();
