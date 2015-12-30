@@ -1,12 +1,12 @@
 var canvas = document.getElementById("canvas");
 var ctx = canvas.getContext("2d");
 var then = new Date().getTime(), now, delta = 0;
-var targetUPS = 120;
-var left, right, a, d;
-var paddleSpeed = 7, ballSpeedX = 4, ballSpeedY = 4;
-var topScore = 0, bottomScore = 0;
+var targetUps = 120;
+var p, l, s, w;
+var paddleSpeed = 7, ballSpeedX = 5, ballSpeedY = 5;
+var leftScore = 0, rightScore = 0;
 var resizeFactorX = 1, resizeFactorY = 1;
-//1280 * 650 normal 16:9 resolution
+//1280 * 650 normal 16:9 resolution (inner window)
 
 canvas.width = 1280;
 canvas.height = 650;
@@ -28,17 +28,17 @@ var ball = {
 		this.x += this.velX;
 		this.y += this.velY;
 
-		if(checkCollision(this, paddleTop) || checkCollision(this, paddleBottom)) {
-			this.velY *= -1;
-		}
-
-		if(this.x + this.width >= canvas.width || this.x <= 0) {
+		if(checkCollision(this, paddleLeft) || checkCollision(this, paddleRight)) {
 			this.velX *= -1;
 		}
 
-		if(this.y < 0 - this.width || this.y > canvas.height) {
-			topScore += this.y > canvas.height / 2 ? 1 : 0;
-			bottomScore += this.y < canvas.height / 2 ? 1 : 0;
+		if(this.y <= 0 || this.y + this.height >= canvas.height) {
+			this.velY *= -1;
+		}
+
+		if(this.x + this.width > canvas.width || this.x < 0) {
+			leftScore += this.x > canvas.width / 2 ? 1 : 0;
+			rightScore += this.x < canvas.width / 2 ? 1 : 0;
 			this.x = canvas.width / 2 - 10 / 2;
 			this.y = canvas.height / 2 - 10 / 2;
 			this.velY = chooseNumber(ballSpeedY, -ballSpeedY);
@@ -47,35 +47,35 @@ var ball = {
 	}
 };
 
-var paddleTop = {
-	x: canvas.width / 2 - 70 / 2,
-	y : 0,
-	width : 70,
-	height : 5,
+var paddleLeft = {
+	x: 10,
+	y : canvas.height / 2 - 70 / 2,
+	width : 5,
+	height : 70,
 	render: function() {
 		ctx.fillStyle = "white";
 		ctx.fillRect(this.x, this.y, this.width, this.height);
 	},
 
 	update: function() {
-		this.x -= a === true ? paddleSpeed : 0;
-		this.x += d === true ? paddleSpeed : 0;
+		this.y += s === true ? paddleSpeed : 0;
+		this.y -= w === true ? paddleSpeed : 0;
 	}
 };
 
-var paddleBottom = {
-	x: canvas.width / 2 - 70 / 2,
-	y : canvas.height - 5,
-	width : 70,
-	height : 5,
+var paddleRight = {
+	x: canvas.width - 15,
+	y : canvas.height / 2 - 50 / 2,
+	width : 5,
+	height : 70,
 	render: function() {
 		ctx.fillStyle = "white";
 		ctx.fillRect(this.x, this.y, this.width, this.height);
 	},
 
 	update: function() {
-		this.x -= left === true ? paddleSpeed : 0;
-		this.x += right === true ? paddleSpeed : 0;
+		this.y -= p === true ? paddleSpeed : 0;
+		this.y += l === true ? paddleSpeed : 0;
 	}
 };
 
@@ -99,7 +99,7 @@ function mainGameLoop() {
 	delta += now - then;
 	then = now;
 
-	if(delta >= 1000 / targetUPS) {
+	if(delta >= 1000 / targetUps) {
 		update();
 		delta = 0;
 	}
@@ -114,19 +114,18 @@ function render() {
 	ctx.fillRect(0, 0, canvas.width, canvas.height);
 
 	ball.render();
-	paddleTop.render();
-	paddleBottom.render();
+	paddleLeft.render();
+	paddleRight.render();
 
 	ctx.fillStyle = "white";
-	ctx.fillText(bottomScore, 0, canvas.height - 20);
-	ctx.fillText(topScore, 0, 20);
+	ctx.fillText(leftScore, 20, 20);
+	ctx.fillText(rightScore, canvas.width - 20, 20);
 }
 
 function update() {
 	ball.update();
-	paddleTop.update();
-	paddleBottom.update();
-	console.log(window.innerWidth, window.innerHeight);
+	paddleLeft.update();
+	paddleRight.update();
 }
 
 function resize() {
@@ -136,15 +135,15 @@ function resize() {
 	canvas.width = window.innerWidth;
 	canvas.height = window.innerHeight;
 
-	paddleTop.width *= resizeFactorX;
-	paddleTop.height *= resizeFactorY;
-	paddleTop.x *= resizeFactorX;
-	paddleTop.y *= resizeFactorY;
+	paddleLeft.width *= resizeFactorX;
+	paddleLeft.height *= resizeFactorY;
+	paddleLeft.x *= resizeFactorX;
+	paddleLeft.y *= resizeFactorY;
 
-	paddleBottom.width *= resizeFactorX;
-	paddleBottom.height *= resizeFactorY;
-	paddleBottom.x *= resizeFactorX;
-	paddleBottom.y *= resizeFactorY;
+	paddleRight.width *= resizeFactorX;
+	paddleRight.height *= resizeFactorY;
+	paddleRight.x *= resizeFactorX;
+	paddleRight.y *= resizeFactorY;
 
 	ball.width *= resizeFactorX;
 	ball.height *= resizeFactorY;
@@ -162,17 +161,17 @@ window.addEventListener('resize', resize);
 
 document.addEventListener('keydown', function(event) {
 	switch(event.keyCode) {
-		case 37:
-			left = true;
+		case 80:
+			p = true;
 			break;
-		case 39:
-			right = true;
+		case 76:
+			l = true;
 			break;
-		case 65:
-			a = true;
+		case 87:
+			w = true;
 			break;
-		case 68:
-			d = true;
+		case 83:
+			s = true;
 			break;
 		default:
 			break;
@@ -181,17 +180,17 @@ document.addEventListener('keydown', function(event) {
 
 document.addEventListener('keyup', function(event) {
 	switch(event.keyCode) {
-		case 37:
-			left = false;
+		case 80:
+			p = false;
 			break;
-		case 39:
-			right = false;
+		case 76:
+			l = false;
 			break;
-		case 65:
-			a = false;
+		case 87:
+			w = false;
 			break;
-		case 68:
-			d = false;
+		case 83:
+			s = false;
 			break;
 		default:
 			break;
@@ -199,5 +198,4 @@ document.addEventListener('keyup', function(event) {
 });
 
 resize();
-
 mainGameLoop();
