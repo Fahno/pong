@@ -2,7 +2,7 @@ var canvas = document.getElementById("canvas");
 var ctx = canvas.getContext("2d");
 var then = new Date().getTime(), now, delta = 0;
 var targetUps = 120;
-var p, l, s, w;
+var k, m, s, w, pause;
 var paddleSpeed = 7, ballSpeedX = 5, ballSpeedY = 5;
 var leftScore = 0, rightScore = 0;
 var resizeFactorX = 1, resizeFactorY = 1;
@@ -19,6 +19,8 @@ var ball = {
 	velY: chooseNumber(ballSpeedY, -ballSpeedY),
 	velX: chooseNumber(ballSpeedX, -ballSpeedX),
 	render: function() {
+		ctx.fillStyle = "black";
+		ctx.fillRect(this.x - 1, this.y - 1, this.width + 2, this.height + 2);
 		ctx.fillStyle = "white";
 		ctx.fillRect(this.x, this.y, this.width, this.height);
 	},
@@ -80,8 +82,8 @@ var paddleRight = {
 	},
 
 	update: function() {
-		this.y -= p === true ? paddleSpeed : 0;
-		this.y += l === true ? paddleSpeed : 0;
+		this.y -= k === true ? paddleSpeed : 0;
+		this.y += m === true ? paddleSpeed : 0;
 		this.y = clamp(this.y, 0, canvas.height - this.height);
 	}
 };
@@ -119,6 +121,12 @@ function mainGameLoop() {
 
 	render();
 
+	if(pause) {
+		targetUps = 0;
+	} else {
+		targetUps = 120;
+	}
+
 	window.requestAnimationFrame(mainGameLoop);
 }
 
@@ -131,16 +139,21 @@ function render() {
 	paddleRight.render();
 
 	ctx.fillStyle = "white";
-	ctx.fillText(leftScore, 20, 20);
-	ctx.fillText(rightScore, canvas.width - 20, 20);
+	for(var i = 0; i <= 15; i++) {
+		ctx.fillRect(canvas.width / 2 - ball.width / 2, canvas.height / 30 * i * 2, ball.width, canvas.height / 30);
+	}
+	ctx.font = "30px Arial Rounded MT Bold";
+	ctx.fillText(leftScore, 10, 25);
+	ctx.fillText(rightScore, canvas.width - 30, 25);
+	if(pause) {
+		ctx.fillText("Paused", canvas.width / 2.1, canvas.height / 2.1);
+	}
 }
 
 function update() {
 	ball.update();
 	paddleLeft.update();
 	paddleRight.update();
-
-
 }
 
 function resize() {
@@ -176,11 +189,11 @@ window.addEventListener('resize', resize);
 
 document.addEventListener('keydown', function(event) {
 	switch(event.keyCode) {
-		case 80:
-			p = true;
+		case 75:
+			k = true;
 			break;
-		case 76:
-			l = true;
+		case 77:
+			m = true;
 			break;
 		case 87:
 			w = true;
@@ -188,6 +201,9 @@ document.addEventListener('keydown', function(event) {
 		case 83:
 			s = true;
 			break;
+		case 80:
+		 pause = !pause;
+		 break;
 		default:
 			break;
 	}
@@ -195,11 +211,11 @@ document.addEventListener('keydown', function(event) {
 
 document.addEventListener('keyup', function(event) {
 	switch(event.keyCode) {
-		case 80:
-			p = false;
+		case 75:
+			k = false;
 			break;
-		case 76:
-			l = false;
+		case 77:
+			m = false;
 			break;
 		case 87:
 			w = false;
