@@ -24,19 +24,17 @@ var ball = {
 	},
 
 	update: function() {
-		console.log("VelY: " + this.velY + ", VelX: " + this.velX + ", X: " + this.x + ", Y: " + this.y + ", BallSpeedY: " + ballSpeedY);
-
 		this.x += this.velX;
 		this.y += this.velY;
 
 		if(checkCollision(this, paddleLeft)) {
 			this.velX *= -1;
-			this.velY = ballSpeedY * 1.5 * ((this.y - paddleLeft.y) / paddleRight.height);
+			this.velY = ballSpeedY * 1.5 * ((this.y - (paddleLeft.y + paddleLeft.height / 2)) / paddleRight.height);
 		}
 
 		if(checkCollision(this, paddleRight)) {
 			this.velX *= -1;
-			this.velY = ballSpeedY * 1.5 * ((this.y - paddleRight.y) / paddleRight.height);
+			this.velY = ballSpeedY * 1.5 * ((this.y - (paddleRight.y + paddleRight.height / 2)) / paddleRight.height);
 		}
 
 		if(this.y <= 0 || this.y + this.height >= canvas.height) {
@@ -141,6 +139,8 @@ function update() {
 	ball.update();
 	paddleLeft.update();
 	paddleRight.update();
+
+
 }
 
 function resize() {
